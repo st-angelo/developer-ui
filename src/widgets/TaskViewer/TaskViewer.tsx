@@ -25,7 +25,7 @@ const TaskViewer: React.FC<TaskViewerProps> = ({ socket }: TaskViewerProps) => {
 
   return (
     <Grid>
-      <span>{message}</span>
+      <span>The message is: {message}</span>
     </Grid>
   );
 };
