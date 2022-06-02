@@ -1,49 +1,116 @@
-import { Grid } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+/* TaskViewer widget
+ * In development...
+ */
+import { Grid, Link, makeStyles } from '@material-ui/core';
+import { Delete } from '@material-ui/icons';
+import sortBy from 'lodash.sortby';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSocketContext } from '../../features/socketWrapper';
+import { DeletedIssueResponse, IssueDto, IssueXRouteResponse } from './dtos';
 import { Events } from './events';
-import IssueDto from './issueDto';
+import styles from './styles';
+
+interface Issue {
+  issueXRouteId: string;
+  route: string;
+  issue: IssueDto;
+}
+
+const useStyles = makeStyles(styles);
 
 interface TaskViewerProps {}
 
 const TaskViewer: React.FC<TaskViewerProps> = () => {
-  const [issues, setIssues] = useState<IssueDto[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const classes = useStyles();
 
   const socket = useSocketContext();
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      if (!socket) return;
+      socket.emit(Events.DeleteIssue, { id });
+    },
+    [socket]
+  );
 
   useEffect(() => {
     if (!socket) return;
 
-    const issueListener = (response: IssueDto) =>
+    const issueXRoute = (response: IssueXRouteResponse) =>
       setIssues(prev => {
-        const newIssues = prev.filter(issue => issue.id !== response.id);
-        newIssues.push(response);
-        return newIssues.sort((x, y) => y.priority - x.priority);
+        const newIssues = prev.filter(
+          issue => issue.issueXRouteId !== response.id
+        );
+        newIssues.push({
+          issueXRouteId: response.id,
+          route: response.route,
+          issue: response.issue,
+        });
+        return sortBy(newIssues, ['priority', 'name']);
       });
 
-    socket.on(Events.Issue, issueListener);
+    const deletedIssue = (response: DeletedIssueResponse) =>
+      setIssues(prev =>
+        prev.filter(issue => issue.issueXRouteId !== response.id)
+      );
+
+    socket.on(Events.IssueXRoute, issueXRoute);
+    socket.on(Events.DeletedIssue, deletedIssue);
+
     socket.emit(Events.GetIssues, { route: '/test/:id' });
 
     return () => {
-      socket.off(Events.Issue, issueListener);
+      socket.off(Events.IssueXRoute, issueXRoute);
+      socket.off(Events.DeletedIssue, deletedIssue);
     };
   }, [socket]);
 
   return (
     <Grid>
       {issues &&
-        issues.map(issue => (
-          <div
-            key={issue.id}
-            style={{
-              border: '2px solid white',
-              borderRadius: '10px',
-              padding: '15px',
-              marginBlock: '15px',
-            }}
-          >
-            <h1>Issue: {issue.name}</h1>
-            <p>Status: {issue.status}</p>
+        issues.map(({ issue }) => (
+          <div className={classes.card} key={issue.id}>
+            <div
+              className={classes.exit}
+              onClick={() => handleDelete(issue.id)}
+            >
+              <Delete />
+            </div>
+            <div className={classes.title}>
+              <Link />{' '}
+              <span>
+                {issue.key}: {issue.name}
+              </span>
+            </div>
+            <div className={classes.summary}>
+              <div>
+                <img
+                  className={classes.icon}
+                  src={issue.typeIconUrl}
+                  alt="..."
+                />{' '}
+                <span className={classes.bold}>{issue.type}</span>
+              </div>
+              <span>{issue.description}</span>
+            </div>
+            <div>
+              <div className={classes.statStart}>
+                <span className={classes.bold}>Status:</span>{' '}
+                <span className={classes.bullet}>{issue.status}</span>
+              </div>
+              <div className={classes.statEnd}>
+                <span className={classes.bold}>Priority:</span>{' '}
+                <span className={classes.bullet}>
+                  <img
+                    className={classes.icon}
+                    src={issue.priorityIconUrl}
+                    alt="..."
+                  />{' '}
+                  {issue.priority}
+                </span>
+              </div>
+            </div>
           </div>
         ))}
     </Grid>
