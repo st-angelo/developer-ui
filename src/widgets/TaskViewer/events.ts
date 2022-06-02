@@ -1,4 +1,6 @@
 export enum Events {
-  MESSAGE = 'MESSAGE',
-  GET_MESSAGE = 'GET_MESSAGE',
+  GetIssues = 'GetIssues',
+  Issue = 'Issue',
+  AddIssue = 'AddIssue',
+  DeletedIssue = 'DeletedIssue',
 }

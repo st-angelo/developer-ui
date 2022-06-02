@@ -16,5 +16,5 @@ yarn add developer-ui
 import AutoComplete from "developer-ui";
 ```
 
-**1.0.0**
-Released with task viewer
+**0.0.6-beta**
+Still testing...
