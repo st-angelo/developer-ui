@@ -13,8 +13,8 @@ yarn add developer-ui
 ## Usage
 
 ```jsx
-import AutoComplete from "developer-ui";
+import AutoComplete from 'developer-ui';
 ```
 
-**0.0.19-beta**
+**0.0.22-beta**
 Still testing...

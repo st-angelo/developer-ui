@@ -33,6 +33,14 @@ const styles = (_?: Theme) =>
       display: 'flex',
       gap: '5px',
       alignItems: 'center',
+      textDecoration: 'none',
+      cursor: 'pointer',
+      '& span': {
+        color: '#2da3ad',
+      },
+      '& svg': {
+        color: '#2da3ad',
+      },
     },
     name: {
       marginBottom: '20px',

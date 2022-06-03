@@ -91,11 +91,14 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
             >
               <Delete />
             </span>
-            <div className={classes.key}>
-              <a href={issue.url} target="_blank" rel="noopener noreferrer">
-                <Link /> <span>{issue.key}</span>
-              </a>
-            </div>
+            <a
+              href={issue.url}
+              className={classes.key}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Link /> <span>{issue.key}</span>
+            </a>
             <div className={classes.name}>
               <span>{issue.name}</span>
             </div>
