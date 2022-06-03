@@ -16,5 +16,5 @@ yarn add developer-ui
 import AutoComplete from "developer-ui";
 ```
 
-**0.0.17-beta**
+**0.0.18-beta**
 Still testing...

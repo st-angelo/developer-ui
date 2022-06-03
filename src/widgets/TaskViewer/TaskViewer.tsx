@@ -149,11 +149,13 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
             <Paper className={classes.addPaper}>
               <TextField
                 id={'key'}
+                label={'Issue key (e.g. ERPFINSFLO-123)'}
                 value={keyAdd}
                 onChange={e => setKeyAdd(e.target.value)}
               />
               <TextField
                 id={'route'}
+                label={'Route pattern (#todo - get it from current route)'}
                 value={routeAdd}
                 onChange={e => setRouteAdd(e.target.value)}
               />

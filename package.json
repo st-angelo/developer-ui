@@ -1,6 +1,6 @@
 {
   "name": "developer-ui",
-  "version": "0.0.17-beta",
+  "version": "0.0.18-beta",
   "description": "Developer UI components",
   "main": "./src/index.js",
   "babel": {
