@@ -21,6 +21,7 @@ export interface IssueDto {
   id: string;
   key: string;
   route?: string;
+  url: string;
   name: string;
   type: string;
   typeDescription: string;

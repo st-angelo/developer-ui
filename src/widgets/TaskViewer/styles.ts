@@ -6,7 +6,7 @@ const styles = (_?: Theme) =>
       margin: '20px',
       padding: '20px',
       width: '300px',
-      display: 'block',
+      display: 'inline-block',
       borderRadius: '15px',
       boxShadow: '0px 6px 10px rgba(68, 68, 68, 0.25)',
       transition: 'all 0.2s',

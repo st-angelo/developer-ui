@@ -92,7 +92,9 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
               <Delete />
             </span>
             <div className={classes.key}>
-              <Link /> <span>{issue.key}</span>
+              <a href={issue.url} target="_blank" rel="noopener noreferrer">
+                <Link /> <span>{issue.key}</span>
+              </a>
             </div>
             <div className={classes.name}>
               <span>{issue.name}</span>
@@ -128,6 +130,7 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
             <a
               className={classes.assigneeLinkWrapper}
               target="_blank"
+              rel="noopener noreferrer"
               href={`https://teams.microsoft.com/l/chat/0/0?users=${issue.assigneeEmail}`}
             >
               <div className={classes.assigneeContainer}>
