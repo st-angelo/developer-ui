@@ -95,21 +95,27 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
               <Link /> <span>{issue.key}</span>
             </div>
             <div className={classes.name}>
-              <span>${issue.name}</span>
+              <span>{issue.name}</span>
             </div>
             <div className={`${classes.centered} ${classes.summary}`}>
-              <span className={classes.bold}>Issue type</span>{' '}
-              <img className={classes.icon} src={issue.typeIconUrl} alt="..." />{' '}
-              <span className={classes.bold}>{issue.type}</span>
+              <span className={classes.label}>Issue type:</span>
+              <img
+                className={classes.icon}
+                src={issue.typeIconUrl}
+                alt="..."
+              />{' '}
+              <span className={`${classes.bold} ${classes.value}`}>
+                {issue.type}
+              </span>
             </div>
             <div className={classes.stats}>
               <div className={classes.statStart}>
-                <span className={classes.bold}>Status:</span>{' '}
+                <span className={classes.label}>Status:</span>
                 <span className={classes.bullet}>{issue.status}</span>
               </div>
               <div className={classes.statEnd}>
-                <span className={classes.bold}>Priority:</span>{' '}
-                <span>
+                <span className={classes.label}>Priority:</span>
+                <span className={classes.value}>
                   <img
                     className={classes.icon}
                     src={issue.priorityIconUrl}
@@ -125,12 +131,13 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
               href={`https://teams.microsoft.com/l/chat/0/0?users=${issue.assigneeEmail}`}
             >
               <div className={classes.assigneeContainer}>
+                <span className={classes.label}>Assignee:</span>
                 <img
                   className={classes.avatar}
                   src={issue.assigneeAvatarUrl}
                   alt="..."
                 />
-                <span className={classes.assignee}>{issue.assigneeName}</span>
+                <span className={classes.bold}>{issue.assigneeName}</span>
                 <Forum />
               </div>
             </a>
