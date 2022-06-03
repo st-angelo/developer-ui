@@ -1,24 +1,36 @@
-export interface IssueXRouteResponse {
-  id: string;
+export interface IssueExistsResponse {
+  issueKey: string;
   route: string;
-  issue: IssueDto;
 }
 
-export interface DeletedIssueResponse {
-  id: string;
+export interface IssueDeletedResponse {
+  issueKey: string;
+  route: string;
+}
+
+export interface IssueNotFoundResponse {
+  issueKey: string;
+  route: string;
+}
+
+export interface IssueInvalidResponse {
+  issueKey: string;
 }
 
 export interface IssueDto {
   id: string;
   key: string;
+  route?: string;
   name: string;
-  description: string;
   type: string;
   typeDescription: string;
   typeIconUrl: string;
   status: string;
   statusDescription: string;
   priority: number;
+  priorityName: string;
   priorityIconUrl: string;
-  assignee: string;
+  assigneeName: string;
+  assigneeEmail: string;
+  assigneeAvatarUrl: string;
 }

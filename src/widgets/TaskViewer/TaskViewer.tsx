@@ -1,35 +1,50 @@
 /* TaskViewer widget
  * In development...
  */
-import { Grid, Link, makeStyles } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
+import {
+  Button,
+  Fade,
+  IconButton,
+  makeStyles,
+  Paper,
+  Popper,
+  TextField,
+} from '@material-ui/core';
+import { Add, Delete, Forum, Link } from '@material-ui/icons';
 import sortBy from 'lodash.sortby';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSocketContext } from '../../features/socketWrapper';
-import { DeletedIssueResponse, IssueDto, IssueXRouteResponse } from './dtos';
+import { IssueDeletedResponse, IssueDto } from './dtos';
 import { Events } from './events';
 import styles from './styles';
-
-interface Issue {
-  issueXRouteId: string;
-  route: string;
-  issue: IssueDto;
-}
 
 const useStyles = makeStyles(styles);
 
 interface TaskViewerProps {}
 
 const TaskViewer: React.FC<TaskViewerProps> = () => {
-  const [issues, setIssues] = useState<Issue[]>([]);
+  const [issues, setIssues] = useState<IssueDto[]>([]);
+  const [addPopperOpen, setAddPopperOpen] = useState(false);
+  const [keyAdd, setKeyAdd] = useState('');
+  const [routeAdd, setRouteAdd] = useState('');
   const classes = useStyles();
+  // TODO implement route pattern fetching
+  const routePattern = '/test/:id';
 
   const socket = useSocketContext();
 
+  const handleAdd = useCallback(() => {
+    if (!socket) return;
+    socket.emit(Events.AddIssue, {
+      issueKey: keyAdd,
+      route: routeAdd,
+    });
+  }, [keyAdd, routeAdd]);
+
   const handleDelete = useCallback(
-    (id: string) => {
+    (issueKey: string, route: string) => {
       if (!socket) return;
-      socket.emit(Events.DeleteIssue, { id });
+      socket.emit(Events.DeleteIssue, { issueKey, route });
     },
     [socket]
   );
@@ -37,83 +52,125 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const issueXRoute = (response: IssueXRouteResponse) =>
+    const issueHandler = (response: IssueDto) => {
+      if (response.route && response.route !== routePattern) return;
       setIssues(prev => {
-        const newIssues = prev.filter(
-          issue => issue.issueXRouteId !== response.id
-        );
-        newIssues.push({
-          issueXRouteId: response.id,
-          route: response.route,
-          issue: response.issue,
-        });
+        const newIssues = prev.filter(issue => issue.key !== response.key);
+        newIssues.push({ ...response, route: routePattern });
         return sortBy(newIssues, ['priority', 'name']);
       });
+    };
 
-    const deletedIssue = (response: DeletedIssueResponse) =>
-      setIssues(prev =>
-        prev.filter(issue => issue.issueXRouteId !== response.id)
-      );
+    const issueDeletedHandler = (response: IssueDeletedResponse) => {
+      if (response.route !== routePattern) return;
+      setIssues(prev => prev.filter(issue => issue.key !== response.issueKey));
+    };
 
-    socket.on(Events.IssueXRoute, issueXRoute);
-    socket.on(Events.DeletedIssue, deletedIssue);
+    socket.on(Events.Issue, issueHandler);
+    socket.on(Events.IssueDeleted, issueDeletedHandler);
 
-    socket.emit(Events.GetIssues, { route: '/test/:id' });
+    socket.emit(Events.GetIssues, { route: routePattern });
 
     return () => {
-      socket.off(Events.IssueXRoute, issueXRoute);
-      socket.off(Events.DeletedIssue, deletedIssue);
+      socket.off(Events.Issue, issueHandler);
+      socket.off(Events.IssueDeleted, issueDeletedHandler);
     };
   }, [socket]);
 
+  console.log(issues);
+
+  // TODO: Implement the actual UI; below is just a test
   return (
-    <Grid>
+    <>
       {issues &&
-        issues.map(({ issue }) => (
+        issues.map(issue => (
           <div className={classes.card} key={issue.id}>
-            <div
+            <span
               className={classes.exit}
-              onClick={() => handleDelete(issue.id)}
+              onClick={() => handleDelete(issue.key, routePattern)}
             >
               <Delete />
+            </span>
+            <div className={classes.key}>
+              <Link /> <span>{issue.key}</span>
             </div>
-            <div className={classes.title}>
-              <Link />{' '}
-              <span>
-                {issue.key}: {issue.name}
-              </span>
+            <div className={classes.name}>
+              <span>${issue.name}</span>
             </div>
-            <div className={classes.summary}>
-              <div>
-                <img
-                  className={classes.icon}
-                  src={issue.typeIconUrl}
-                  alt="..."
-                />{' '}
-                <span className={classes.bold}>{issue.type}</span>
-              </div>
-              <span>{issue.description}</span>
+            <div className={`${classes.centered} ${classes.summary}`}>
+              <span className={classes.bold}>Issue type</span>{' '}
+              <img className={classes.icon} src={issue.typeIconUrl} alt="..." />{' '}
+              <span className={classes.bold}>{issue.type}</span>
             </div>
-            <div>
+            <div className={classes.stats}>
               <div className={classes.statStart}>
                 <span className={classes.bold}>Status:</span>{' '}
                 <span className={classes.bullet}>{issue.status}</span>
               </div>
               <div className={classes.statEnd}>
                 <span className={classes.bold}>Priority:</span>{' '}
-                <span className={classes.bullet}>
+                <span>
                   <img
                     className={classes.icon}
                     src={issue.priorityIconUrl}
                     alt="..."
-                  />{' '}
-                  {issue.priority}
+                  />
+                  <em>{issue.priorityName}</em>
                 </span>
               </div>
             </div>
+            <a
+              className={classes.assigneeLinkWrapper}
+              target="_blank"
+              href={`https://teams.microsoft.com/l/chat/0/0?users=${issue.assigneeEmail}`}
+            >
+              <div className={classes.assigneeContainer}>
+                <img
+                  className={classes.avatar}
+                  src={issue.assigneeAvatarUrl}
+                  alt="..."
+                />
+                <span className={classes.assignee}>{issue.assigneeName}</span>
+                <Forum />
+              </div>
+            </a>
           </div>
         ))}
-    </Grid>
+      <Popper open={addPopperOpen} transition>
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Paper className={classes.addPaper}>
+              <TextField
+                id={'key'}
+                value={keyAdd}
+                onChange={e => setKeyAdd(e.target.value)}
+              />
+              <TextField
+                id={'route'}
+                value={routeAdd}
+                onChange={e => setRouteAdd(e.target.value)}
+              />
+              <Button color={'primary'} onClick={handleAdd}>
+                Add
+              </Button>
+              <Button
+                color={'secondary'}
+                onClick={() => setAddPopperOpen(false)}
+              >
+                Cancel
+              </Button>
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
+      <IconButton
+        color={'primary'}
+        className={classes.add}
+        onClick={() => setAddPopperOpen(prev => !prev)}
+      >
+        <Add />
+      </IconButton>
+    </>
   );
 };
 

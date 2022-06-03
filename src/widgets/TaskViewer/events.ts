@@ -1,9 +1,10 @@
 export enum Events {
   GetIssues = 'GetIssues',
-  IssueXRoute = 'IssueXRoute',
+  Issue = 'Issue',
   AddIssue = 'AddIssue',
-  IssueExists = 'IssueExists',
   DeleteIssue = 'DeleteIssue',
-  DeletedIssue = 'DeletedIssue',
-  IssueDoesNotExist = 'IssueDoesNotExist',
+  IssueExists = 'IssueExists',
+  IssueNotFound = 'IssueNotFound',
+  IssueDeleted = 'IssueDeleted',
+  IssueInvalid = 'IssueInvalid',
 }

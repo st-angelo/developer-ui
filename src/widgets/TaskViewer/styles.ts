@@ -5,10 +5,9 @@ const styles = (_?: Theme) =>
     card: {
       margin: '20px',
       padding: '20px',
-      width: '400px',
-      minHeight: '1750px',
+      width: '300px',
       display: 'block',
-      borderRadius: '10px',
+      borderRadius: '15px',
       boxShadow: '0px 6px 10px rgba(68, 68, 68, 0.25)',
       transition: 'all 0.2s',
       color: 'rgba(50, 50, 50, 0.9)',
@@ -25,15 +24,24 @@ const styles = (_?: Theme) =>
       fontSize: '20px',
       right: '20px',
       top: '20px',
+      color: 'orangered',
     },
-    title: {
+    key: {
+      fontSize: '18px',
+      fontWeight: 700,
+      color: '#2da3ad',
+    },
+    name: {
       marginBottom: '20px',
       fontWeight: 700,
-      fontSize: '20px',
+      fontSize: '15px',
       display: 'block',
     },
     summary: {
       marginBottom: '20px',
+    },
+    stats: {
+      marginBottom: '10px',
     },
     statStart: {
       display: 'inline-block',
@@ -41,7 +49,7 @@ const styles = (_?: Theme) =>
     statEnd: {
       display: 'inline-block',
       float: 'right',
-      marginRight: '50px',
+      marginRight: '70px',
     },
     bold: {
       fontWeight: 700,
@@ -53,9 +61,57 @@ const styles = (_?: Theme) =>
       backgroundColor: '#2da3ad',
       color: 'white',
     },
+    assigneeLinkWrapper: {
+      display: 'flex',
+    },
+    assigneeContainer: {
+      borderRadius: '15px',
+      alignItems: 'center',
+      bosShadow: '2px 1px 3px 0 lightgray',
+      padding: '5px',
+      gap: '10px',
+      cursor: 'pointer',
+      color: '#2da3ad',
+      textDecoration: 'none',
+      display: 'inline-flex',
+      border: '1px solid white',
+      '&:hover': {
+        border: '1px solid lightgray',
+      },
+    },
+    avatar: {
+      borderRadius: '50%',
+    },
+    assignee: {
+      fontWeight: 700,
+      color: 'rgba(50, 50, 50, 0.9)',
+    },
     icon: {
       width: '15px',
       height: '15px',
+      marginRight: '2px',
+    },
+    centered: {
+      display: 'flex',
+      alignItems: 'center',
+    },
+    add: {
+      position: 'fixed',
+      right: '50px',
+      bottom: '50px',
+    },
+    addPaper: {
+      width: '300px',
+      margin: '20px',
+      padding: '20px',
+      '& MuiTextField-root': {
+        width: '100%',
+        padding: '5px',
+      },
+      '& MuiButton-root': {
+        marginTop: '10px',
+        marginRight: '10px',
+      },
     },
   });
 
