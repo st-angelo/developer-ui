@@ -13,8 +13,17 @@ import {
 import { Add, Delete, Forum, Link } from '@material-ui/icons';
 import sortBy from 'lodash.sortby';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useSocketContext } from '../../features/socketWrapper';
-import { IssueDeletedResponse, IssueDto } from './dtos';
+import {
+  IssueDeletedResponse,
+  IssueDto,
+  IssueExistsResponse,
+  IssueInvalidResponse,
+  IssueIsCompletedResponse,
+  IssueNotFoundResponse,
+} from './dtos';
 import { Events } from './events';
 import styles from './styles';
 
@@ -24,12 +33,11 @@ interface TaskViewerProps {}
 
 const TaskViewer: React.FC<TaskViewerProps> = () => {
   const [issues, setIssues] = useState<IssueDto[]>([]);
-  const [addPopperOpen, setAddPopperOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [keyAdd, setKeyAdd] = useState('');
-  const [routeAdd, setRouteAdd] = useState('');
   const classes = useStyles();
-  // TODO implement route pattern fetching
-  const routePattern = '/test/:id';
+
+  const { pathname: routePattern } = useLocation();
 
   const socket = useSocketContext();
 
@@ -37,17 +45,23 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
     if (!socket) return;
     socket.emit(Events.AddIssue, {
       issueKey: keyAdd,
-      route: routeAdd,
+      route: routePattern,
     });
-  }, [keyAdd, routeAdd]);
+  }, [keyAdd, routePattern]);
 
   const handleDelete = useCallback(
-    (issueKey: string, route: string) => {
+    (issueKey: string) => {
       if (!socket) return;
-      socket.emit(Events.DeleteIssue, { issueKey, route });
+      socket.emit(Events.DeleteIssue, { issueKey, route: routePattern });
     },
-    [socket]
+    [socket, routePattern]
   );
+
+  useEffect(() => {
+    if (!socket) return;
+    setIssues([]);
+    socket.emit(Events.GetIssues, { route: routePattern });
+  }, [socket, routePattern]);
 
   useEffect(() => {
     if (!socket) return;
@@ -61,23 +75,61 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
       });
     };
 
-    const issueDeletedHandler = (response: IssueDeletedResponse) => {
-      if (response.route !== routePattern) return;
-      setIssues(prev => prev.filter(issue => issue.key !== response.issueKey));
+    const issueDeletedHandler = ({ issueKey, route }: IssueDeletedResponse) => {
+      if (route && route !== routePattern) return;
+      setIssues(prev => prev.filter(issue => issue.key !== issueKey));
     };
+
+    const issueInvalidHandler = ({
+      issueKey,
+      errorMessages,
+    }: IssueInvalidResponse) =>
+      toast.warn(
+        `Key '${issueKey}' could not be added. Error(s):\n${errorMessages.join(
+          '\n'
+        )}`
+      );
+
+    const issueNotFoundHandler = ({
+      issueKey,
+      route,
+    }: IssueNotFoundResponse) => {
+      if (route !== routePattern) return;
+      toast.warn(
+        `Key '${issueKey}' was not registered for this route '${route}'.`
+      );
+    };
+
+    const issueExistsHandler = ({ issueKey, route }: IssueExistsResponse) => {
+      if (route !== routePattern) return;
+      toast.warn(
+        `Key ${issueKey} is already registered for this route '${route}'.`
+      );
+    };
+
+    const issueIsCompletedHandler = ({ issueKey }: IssueIsCompletedResponse) =>
+      toast.warn(
+        `Task with key '${issueKey}' is completed. Change the task's status to add it.`
+      );
 
     socket.on(Events.Issue, issueHandler);
     socket.on(Events.IssueDeleted, issueDeletedHandler);
-
-    socket.emit(Events.GetIssues, { route: routePattern });
+    socket.on(Events.IssueInvalid, issueInvalidHandler);
+    socket.on(Events.IssueNotFound, issueNotFoundHandler);
+    socket.on(Events.IssueExists, issueExistsHandler);
+    socket.on(Events.IssueIsCompleted, issueIsCompletedHandler);
 
     return () => {
       socket.off(Events.Issue, issueHandler);
       socket.off(Events.IssueDeleted, issueDeletedHandler);
+      socket.off(Events.IssueInvalid, issueInvalidHandler);
+      socket.off(Events.IssueNotFound, issueNotFoundHandler);
+      socket.off(Events.IssueExists, issueExistsHandler);
+      socket.off(Events.IssueIsCompleted, issueIsCompletedHandler);
     };
-  }, [socket]);
+  }, [socket, routePattern]);
 
-  console.log(issues);
+  console.log(issues, routePattern);
 
   // TODO: Implement the actual UI; below is just a test
   return (
@@ -87,7 +139,7 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
           <div className={classes.card} key={issue.id}>
             <span
               className={classes.exit}
-              onClick={() => handleDelete(issue.key, routePattern)}
+              onClick={() => handleDelete(issue.key)}
             >
               <Delete />
             </span>
@@ -149,7 +201,12 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
             </a>
           </div>
         ))}
-      <Popper open={addPopperOpen} transition>
+      <Popper
+        open={Boolean(anchorEl)}
+        placement={'top-end'}
+        anchorEl={anchorEl}
+        transition
+      >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps} timeout={350}>
             <Paper className={classes.addPaper}>
@@ -159,18 +216,12 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
                 value={keyAdd}
                 onChange={e => setKeyAdd(e.target.value)}
               />
-              <TextField
-                id={'route'}
-                label={'Route pattern (#todo - get it from current route)'}
-                value={routeAdd}
-                onChange={e => setRouteAdd(e.target.value)}
-              />
-              <Button color={'primary'} onClick={handleAdd}>
+              <Button className={classes.addBtn} onClick={handleAdd}>
                 Add
               </Button>
               <Button
-                color={'secondary'}
-                onClick={() => setAddPopperOpen(false)}
+                className={classes.cancelBtn}
+                onClick={() => setAnchorEl(null)}
               >
                 Cancel
               </Button>
@@ -179,9 +230,8 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
         )}
       </Popper>
       <IconButton
-        color={'primary'}
         className={classes.add}
-        onClick={() => setAddPopperOpen(prev => !prev)}
+        onClick={ev => setAnchorEl(prev => (prev ? null : ev.currentTarget))}
       >
         <Add />
       </IconButton>

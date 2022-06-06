@@ -115,6 +115,11 @@ const styles = (_?: Theme) =>
       position: 'fixed',
       right: '50px',
       bottom: '50px',
+      backgroundColor: '#2da3ad',
+      color: 'white',
+      '&:hover': {
+        backgroundColor: '#2da3ad',
+      },
     },
     addPaper: {
       width: '250px',
@@ -124,9 +129,29 @@ const styles = (_?: Theme) =>
         width: '100%',
         padding: '5px',
       },
+      '& .MuiInput-underline::after': {
+        borderBottom: '2px solid #2da3ad',
+      },
+      '& .MuiFormLabel-root.Mui-focused': {
+        color: '#2da3ad',
+      },
       '& .MuiButton-root': {
         marginTop: '10px',
         marginRight: '10px',
+        fontWeight: 700,
+        color: 'white',
+      },
+    },
+    addBtn: {
+      backgroundColor: '#2da3ad',
+      '&:hover': {
+        backgroundColor: '#2da3ad',
+      },
+    },
+    cancelBtn: {
+      backgroundColor: 'orangered',
+      '&:hover': {
+        backgroundColor: 'orangered',
       },
     },
   });

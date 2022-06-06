@@ -5,7 +5,7 @@ export interface IssueExistsResponse {
 
 export interface IssueDeletedResponse {
   issueKey: string;
-  route: string;
+  route?: string;
 }
 
 export interface IssueNotFoundResponse {
@@ -14,6 +14,11 @@ export interface IssueNotFoundResponse {
 }
 
 export interface IssueInvalidResponse {
+  issueKey: string;
+  errorMessages: string[];
+}
+
+export interface IssueIsCompletedResponse {
   issueKey: string;
 }
 
