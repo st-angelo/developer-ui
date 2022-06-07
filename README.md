@@ -29,5 +29,5 @@ import { TaskViewer } from 'developer-ui';
 
 ```
 
-**0.0.36-beta**
+**0.0.41-beta**
 Still testing...

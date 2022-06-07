@@ -190,9 +190,8 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
             </div>
             <a
               className={classes.assigneeLinkWrapper}
-              target="_blank"
               rel="noopener noreferrer"
-              href={`https://teams.microsoft.com/l/chat/0/0?users=${issue.assigneeEmail}`}
+              href={`msteams://teams.microsoft.com/l/chat/0/0?users=${issue.assigneeEmail}`}
             >
               <div className={classes.assigneeContainer}>
                 <span className={classes.label}>Assignee:</span>

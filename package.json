@@ -1,9 +1,8 @@
 {
   "name": "developer-ui",
-  "version": "0.0.36-beta",
+  "version": "0.0.41-beta",
   "description": "Collection of components and features meant only for development mode.",
   "main": "./src/index.js",
-  "type": "module",
   "babel": {
     "presets": [
       "@babel/preset-env",
@@ -16,16 +15,21 @@
     ]
   },
   "scripts": {
-    "push": "npm run build && cd ./dist && npm publish",
+    "push": "npm run build && cd dist && npm publish",
     "build": "npm run delete && npm run build:tsc && npm run build:copy-files",
     "build:tsc": "tsc",
-    "build:copy-files": "node ./scripts/copyFiles.js",
+    "build:copy-files": "node ./scripts/copyFiles.mjs",
     "delete": "del-cli --force ./dist",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/st-angelo/developer-ui"
+  },
   "keywords": [
-    "developer-ui"
+    "Developer",
+    "UI"
   ],
   "dependencies": {
     "@babel/preset-env": "^7.17.10",
