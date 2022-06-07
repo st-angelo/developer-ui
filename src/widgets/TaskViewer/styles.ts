@@ -5,7 +5,7 @@ const styles = (_?: Theme) =>
     card: {
       margin: '20px',
       padding: '20px',
-      width: '300px',
+      width: '320px',
       display: 'inline-block',
       borderRadius: '15px',
       boxShadow: '0px 6px 10px rgba(68, 68, 68, 0.25)',

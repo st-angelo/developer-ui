@@ -13,8 +13,21 @@ yarn add developer-ui
 ## Usage
 
 ```jsx
-import AutoComplete from 'developer-ui';
+import { SocketProvider } from 'developer-ui';
+
+...
+<SocketProvider>
+  <App />
+</SocketProvider>
+...
+
+import { TaskViewer } from 'developer-ui';
+
+...
+<TaskViewer />
+...
+
 ```
 
-**0.0.32-beta**
+**0.0.36-beta**
 Still testing...

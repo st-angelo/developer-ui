@@ -11,11 +11,6 @@ import {
   TextField,
 } from '@material-ui/core';
 import { Add, Delete, Forum, Link } from '@material-ui/icons';
-import sortBy from 'lodash.sortby';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useSocketContext } from '../../features/socketWrapper';
 import {
   IssueDeletedResponse,
   IssueDto,
@@ -23,8 +18,13 @@ import {
   IssueInvalidResponse,
   IssueIsCompletedResponse,
   IssueNotFoundResponse,
-} from './dtos';
-import { Events } from './events';
+} from 'developer-published-language/task-viewer/dtos';
+import Events from 'developer-published-language/task-viewer/events';
+import sortBy from 'lodash.sortby';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useSocketContext } from '../../features/socketWrapper';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -69,7 +69,13 @@ const TaskViewer: React.FC<TaskViewerProps> = () => {
     const issueHandler = (response: IssueDto) => {
       if (response.route && response.route !== routePattern) return;
       setIssues(prev => {
-        const newIssues = prev.filter(issue => issue.key !== response.key);
+        const newIssues = [...prev];
+        const currentIdx = newIssues.findIndex(
+          issue => issue.key === response.key
+        );
+        if (currentIdx === -1) {
+          if (!response.route) return newIssues;
+        } else newIssues.splice(currentIdx, 1);
         newIssues.push({ ...response, route: routePattern });
         return sortBy(newIssues, ['priority', 'name']);
       });
