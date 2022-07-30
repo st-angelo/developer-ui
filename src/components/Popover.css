@@ -1,0 +1,24 @@
+/* This fires as soon as the element enters the DOM */
+.popover-enter,
+.popover-appear {
+  opacity: 0;
+  transform: translateY(20%);
+}
+/* This is where we can add the transition*/
+.popover-enter-active,
+.popover-appear-active {
+  opacity: 1;
+  transform: translateY(0%);
+  transition: all 200ms;
+}
+/* This fires as soon as the this.state.showList is false */
+.popover-exit {
+  opacity: 1;
+  transform: translateY(0%);
+}
+/* fires as element leaves the DOM*/
+.popover-exit-active {
+  opacity: 0;
+  transform: translateY(20%);
+  transition: all 200ms;
+}
